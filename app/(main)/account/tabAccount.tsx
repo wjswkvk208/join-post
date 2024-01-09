@@ -111,9 +111,8 @@ const TabAccount = ({ picture }: { picture: string | undefined }) => {
     }
     // Handle form submission with validated data
     updateUser({ arg: { ...data, me } }).then(r => {
-      console.log("rr", r);
-      update({ image: r.url, name: "ssibal" });
-
+      //todo 세션 업데이트
+      update({ image: r.url, name: "" });
       mutate();
     });
   };
@@ -121,10 +120,6 @@ const TabAccount = ({ picture }: { picture: string | undefined }) => {
   if (isLoading) {
     return <Loading />;
   }
-
-  console.log("errors", errors);
-  // console.log("me", picture);
-  // const updateUserWithId = updateUser.bind(null, me?.username ?? "");
 
   return (
     <CardContent>

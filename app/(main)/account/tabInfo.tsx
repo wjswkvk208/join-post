@@ -7,6 +7,8 @@ import { Avatar, Box, Card, CardMedia, Stack, Tab, Typography, styled } from "@m
 import TabList from "@mui/lab/TabList";
 import Post from "../posts/page";
 import { TabContext, TabPanel } from "@mui/lab";
+import CommentList from "../posts/_components/CommentList";
+import MyComments from "../posts/_components/MyComments";
 
 // ** Third Party Imports
 // import DatePicker from "react-datepicker";
@@ -71,7 +73,7 @@ const TabInfo = ({ username, picture }: { username: string | undefined; picture:
         </TabPanel>
 
         <TabPanel sx={{ p: 0 }} value="myComment">
-          <Typography>씨발</Typography>
+          <MyComments username={username} />
         </TabPanel>
       </TabContext>
     </CardContent>
