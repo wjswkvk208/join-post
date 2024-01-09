@@ -108,7 +108,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <Divider />
             <List component="nav">
               {mainListItems}
-              <Divider sx={{ my: 1 }} />
+              {/* <Divider sx={{ my: 1 }} />
+              {secondaryListItems} */}
+            </List>
+            <Divider sx={{ mt: "auto" }} />
+            <List component="nav">
+              {/* {mainListItems}
+              <Divider sx={{ my: 1 }} /> */}
               {secondaryListItems}
             </List>
           </Drawer>
