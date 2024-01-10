@@ -78,7 +78,7 @@ const Post = ({ calendar = true, write = true, username = null }: Props) => {
   };
 
   const { data, isLoading } = useList({
-    path: `/posts`,
+    // path: `/posts`,
     page: paginationModel.page + 1,
     pageSize: paginationModel.pageSize,
     startDate: date.startValue,
@@ -93,7 +93,7 @@ const Post = ({ calendar = true, write = true, username = null }: Props) => {
     return <Loading />;
   }
 
-  if (data.data) {
+  if (data) {
     const rows = data.data;
 
     const meta = data.meta;

@@ -1,7 +1,6 @@
 import axios from "@/app/axios";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
-import qs from "qs";
 
 export const useUserMe = () => {
   const { data, isLoading, mutate } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/users/me`);
@@ -10,8 +9,6 @@ export const useUserMe = () => {
 
 export const useUpdateUser = (me?: any) => {
   const { data, trigger, error } = useSWRMutation(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, (url: string, { arg }: { arg: any }) => {
-    console.log("arg", arg, me);
-    console.log("파일업로드", arg.picture[0].length, me && arg.picture && arg.picture.length > 0);
     if (me && arg.picture && arg.picture.length > 0) {
       console.log({
         headers: {

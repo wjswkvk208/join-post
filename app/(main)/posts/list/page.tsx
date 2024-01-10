@@ -35,7 +35,7 @@ const Post = () => {
   };
 
   const { data, isLoading } = useList({
-    path: `/posts`,
+    // path: `/posts`,
     page: 1,
     pageSize: 10,
     startDate: date.startValue,

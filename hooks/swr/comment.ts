@@ -1,5 +1,6 @@
 import { _comment } from "@/app/(main)/posts/_types/comment";
 import axios from "@/app/axios";
+import { _pagination } from "@/types/pagination";
 import qs from "qs";
 import useSWR from "swr";
 
@@ -11,12 +12,11 @@ export const useComments = ({
   // endDate,
   username,
 }: {
-  postId: number | string | undefined | null;
-  page: string | number;
-  pageSize: string | number;
-  // startDate: Date | null;
-  // endDate: Date | null;
-  username: string | undefined;
+  postId?: number | string | undefined | null;
+  page?: string | number;
+  pageSize?: string | number;
+
+  username?: string | undefined;
 }) => {
   const query = qs.stringify(
     {
@@ -29,8 +29,8 @@ export const useComments = ({
     { skipNulls: true }
   );
 
-  const { data, isLoading, mutate } = useSWR<{ data: _comment[] }>(`${process.env.NEXT_PUBLIC_API_URL}/comments?${query}`);
-  return { data: data?.data, isLoading, mutate };
+  const { data, isLoading, mutate } = useSWR<{ data: _comment[]; meta: _pagination }>(`${process.env.NEXT_PUBLIC_API_URL}/comments?${query}`);
+  return { data: data?.data, meta: data?.meta, isLoading, mutate };
 };
 
 export const updateComment = async ({ arg }: { arg: any }) => {

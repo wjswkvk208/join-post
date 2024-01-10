@@ -5,17 +5,17 @@ import qs from "qs";
 import { _post } from "@/app/(main)/posts/_types/post";
 
 export const useList = ({
-  path,
-  page,
-  pageSize,
+  // path,
+  page = 1,
+  pageSize = 10,
   startDate,
   endDate,
   username,
 }: //rangeDate,
 {
-  path: string;
-  page: number;
-  pageSize: number;
+  // path: string;
+  page?: number | null;
+  pageSize?: number | null;
   startDate?: Date | null;
   endDate?: Date | null;
   //rangeDate?: Date[] | null;
@@ -36,7 +36,7 @@ export const useList = ({
     { skipNulls: true }
   );
 
-  const { data, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}${path}?${query}`);
+  const { data, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/posts?${query}`);
   return { data, isLoading };
 };
 
