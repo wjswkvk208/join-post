@@ -7,7 +7,7 @@ import { useDialog } from "@/hooks/dialog";
 
 import { useList, useView } from "@/hooks/swr/post";
 
-import { Box, Button, DialogContentText, Grid, Stack } from "@mui/material";
+import { Box, Button, DialogContentText, Grid, Stack, TextField } from "@mui/material";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -16,6 +16,7 @@ import TourCard from "@/app/(main)/posts/_components/TourCard";
 
 import CommentList from "../_components/CommentList";
 import { _post } from "@/app/(main)/posts/_types/post";
+import RegionButtons from "../_components/RegionButtons";
 
 const Post = () => {
   const router = useRouter();
@@ -29,17 +30,25 @@ const Post = () => {
     rangeDates: [],
   });
 
-  const handleChange = (d: DatepickerEvent) => {
+  const [region, setRegion] = useState<string[]>([]);
+
+  const handleDate = (d: DatepickerEvent) => {
     const [startValue, endValue, rangeDates] = d;
     setDate(prev => ({ ...prev, endValue, startValue, rangeDates }));
   };
 
-  const { data, isLoading } = useList({
-    // path: `/posts`,
+  const handleRegion = (event: React.MouseEvent<HTMLElement>, newRegions: string[]) => {
+    //console.log(event, newRegions);
+    setRegion(newRegions);
+    // mutate();
+  };
+
+  const { data, isLoading, mutate } = useList({
     page: 1,
     pageSize: 10,
     startDate: date.startValue,
     endDate: date.endValue,
+    region: region,
   });
 
   const { data: view, trigger, reset } = useView();
@@ -48,7 +57,6 @@ const Post = () => {
 
   if (isLoading) {
     return <Loading />;
-    //return <></>;
   }
 
   if (data && data.data) {
@@ -57,8 +65,17 @@ const Post = () => {
     return (
       <Box>
         <Stack direction={"row"} spacing={2} sx={{ mb: 2 }}>
-          <Datepicker onChange={handleChange} locale={ko} startValue={date.startValue} endValue={date.endValue} />
+          <Datepicker onChange={handleDate} locale={ko} startValue={date.startValue} endValue={date.endValue} />
         </Stack>
+
+        <Grid container spacing={3} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={9} md={9}>
+            <RegionButtons value={region} onChange={handleRegion} />
+          </Grid>
+          <Grid item xs={12} sm={3} md={3}>
+            <TextField fullWidth label="검색" id="fullWidth" />
+          </Grid>
+        </Grid>
 
         <Grid
           container
@@ -74,7 +91,7 @@ const Post = () => {
                   title={r.attributes.title}
                   content={r.attributes.content}
                   gameDate={r.attributes.gameDate}
-                  golfCourse={r.attributes.golfCourse.data.attributes}
+                  golfCourse={r.attributes.golfCourse.data?.attributes}
                   user={r.attributes.user.data.attributes}
                   tags={r.attributes.tags}
                   kakao={r.attributes.kakao}
@@ -103,7 +120,6 @@ const Post = () => {
           // }}
           handleEdit={() => {
             router.push(`/posts/edit/${view?.data.id}`);
-            //console.log(view.data.id);
           }}
           handleDelete={() => {
             console.log("delete");

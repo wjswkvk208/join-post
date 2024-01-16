@@ -1,8 +1,9 @@
-import { getSession, useSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 import qs from "qs";
 import { _post } from "@/app/(main)/posts/_types/post";
+import { getRegions } from "@/utils/region";
 
 export const useList = ({
   // path,
@@ -11,6 +12,7 @@ export const useList = ({
   startDate,
   endDate,
   username,
+  region,
 }: //rangeDate,
 {
   // path: string;
@@ -20,29 +22,34 @@ export const useList = ({
   endDate?: Date | null;
   //rangeDate?: Date[] | null;
   username?: string | null;
+  region?: string[];
 }) => {
-  //const fetcher = (url: string) => fetch(url).then(r => r.json());
-  const query = qs.stringify(
-    {
-      "pagination[page]": page,
-      "pagination[pageSize]": pageSize,
-      "filters[user][username][$eq]": username,
-      "filters[gameDate][$gte]": startDate?.toISOString(),
-      "filters[gameDate][$lte]": endDate?.toISOString(),
-      "populate[user][populate][0]": "picture",
-      "populate[golfCourse]": "*",
-      "sort[0]": "id:desc",
-    },
-    { skipNulls: true }
-  );
+  const obj: any = {
+    "pagination[page]": page,
+    "pagination[pageSize]": pageSize,
+    "filters[user][username][$eq]": username,
+    "filters[gameDate][$gte]": startDate?.toISOString(),
+    "filters[gameDate][$lte]": endDate?.toISOString(),
+    //"filters[golfCourse][location][$in]":
+    "populate[user][populate][0]": "picture",
+    "populate[golfCourse]": "*",
+    "sort[0]": "id:desc",
+  };
 
-  const { data, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/posts?${query}`);
-  return { data, isLoading };
+  const regionArr = getRegions(region);
+
+  regionArr &&
+    regionArr.forEach((r, i) => {
+      obj[`filters[golfCourse][location][$in][${i}]`] = r;
+    });
+
+  const query = qs.stringify(obj, { skipNulls: true });
+
+  const { data, isLoading, mutate } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/posts?${query}`);
+  return { data, isLoading, mutate };
 };
 
 const fetcherPOST = async (url: string, { arg }: { arg: any }) => {
-  //const session = Session
-
   const session = await getSession();
   return fetch(url, {
     method: "POST",
@@ -63,8 +70,6 @@ const fetcherPOST = async (url: string, { arg }: { arg: any }) => {
 };
 
 const fetcherPUT = async (url: string, { arg }: { arg: any }) => {
-  //const session = Session
-
   const session = await getSession();
   return fetch(url, {
     method: "PUT",
@@ -95,7 +100,7 @@ export function useEdit(id: string) {
 }
 
 export function useView() {
-  const { data, trigger, isMutating, reset } = useSWRMutation(`${process.env.NEXT_PUBLIC_API_URL}/posts`, async (url: string, { arg }: { arg: string }) => {
+  const { data, trigger, isMutating, reset, error } = useSWRMutation(`${process.env.NEXT_PUBLIC_API_URL}/posts`, async (url: string, { arg }: { arg: string }) => {
     const session = await getSession();
     return fetch(`${url}/${arg}`, {
       method: "GET",
@@ -103,8 +108,6 @@ export function useView() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session?.jwt}`,
       },
-      //body: JSON.stringify({ data: { ...arg } }),
-      // caches: "no-store",
     }).then(res => {
       if (res.status === 401) {
         const error = new Error("로그인을 해주세요.");
@@ -114,5 +117,10 @@ export function useView() {
       return res.json();
     });
   });
-  return { data, trigger, isMutating, reset };
+  return { data, trigger, isMutating, reset, error };
+}
+
+export function useViewWithoutTrigger<T>({ id }: { id: string }) {
+  const { data, error, isLoading } = useSWR<T>(`${process.env.NEXT_PUBLIC_API_URL}/posts/${id}`);
+  return { data, error, isLoading };
 }
