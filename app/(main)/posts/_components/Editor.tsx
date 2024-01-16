@@ -6,9 +6,6 @@ import { styled } from "@mui/system";
 import dynamic from "next/dynamic";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
-// const EditorBlock = styled(Responsive)`
-//   padding-top: 5rem;
-// `;
 
 const QuillWrapper = styled("div")({
   ".ql-editor": {
@@ -22,7 +19,7 @@ const QuillWrapper = styled("div")({
 const Editor = (props: any) => {
   // const [title, setTitle] = useState("");
   // const [content, setContent] = useState("");
-  console.log(props);
+  // console.log(props);
   return (
     <Box sx={{ py: "1rem" }}>
       <Input

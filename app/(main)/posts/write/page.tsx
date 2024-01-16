@@ -7,16 +7,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
 import TagBox from "@/app/(main)/posts/_components/TagBox";
 import { useWrite } from "@/hooks/swr/post";
-import React, { useCallback, useState } from "react";
-import Editor from "@/app/(main)/posts/_components/Editor";
+import React, { useState } from "react";
+
 import { useRouter } from "next/navigation";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import ComboBox from "@/app/(main)/posts/_components/ComboBox";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import postSchema from "../postSchema";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler, useForm } from "react-hook-form";
 import QuillEditor from "@/app/(main)/posts/_components/QuillEditor";
-import GolfCourseComboBox from "@/app/(main)/posts/_components/ComboBox";
 import Loading from "@/components/common/Loading";
 
 type FormInputs = {
@@ -69,13 +66,6 @@ const Write = () => {
     trigger(data, {
       onSuccess: () => router.push("/posts/list"),
     });
-    // // Handle form submission with validated data
-    // updateUser({ arg: { ...data, me } }).then(r => {
-    //   console.log("rr", r);
-    //   update({ image: r.url, name: "ssibal" });
-
-    //   mutate();
-    // });
   };
 
   const editorContent = watch("content");
@@ -153,13 +143,6 @@ const Write = () => {
             </Item>
             <Item>
               <Stack spacing={2}>
-                {/* <Controller
-                  name="tags"
-                  control={control}
-                  render={({ field, fieldState }) => (
-                    
-                  )}
-                ></Controller> */}
                 <TagBox
                   tags={watch("tags")}
                   onChangeTags={(nextTags: any) => {

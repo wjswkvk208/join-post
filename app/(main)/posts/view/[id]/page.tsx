@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 
 const View = ({ params }: { params: { id: string; username: string } }) => {
-  const { data: post, error, isLoading } = useView({ ...params });
+  const { data: post, error, isMutating } = useView();
   const { data: session } = useSession();
   const isOwnPost = (post && post.user.id) === session?.user.id;
   const router = useRouter();
@@ -15,7 +15,7 @@ const View = ({ params }: { params: { id: string; username: string } }) => {
     <ViewerBox
       post={post}
       error={error}
-      isLoading={isLoading}
+      isLoading={isMutating}
       actionButtons={
         isOwnPost && (
           <PostActionButtons

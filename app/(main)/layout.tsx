@@ -53,7 +53,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               </IconButton>
 
               <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-                Dashboard
+                Golf Team Paring Post
               </Typography>
 
               {status === "authenticated" ? (

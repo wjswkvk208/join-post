@@ -1,21 +1,35 @@
 "use client";
-import { Backdrop, Box, Button, Checkbox, CircularProgress, FormControl, FormControlLabel, FormGroup, FormLabel, Grid, Stack } from "@mui/material";
+import { Box, Button, Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, Grid, Input, Stack } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
 import TagBox from "@/app/(main)/posts/_components/TagBox";
-import { useEdit, useView } from "@/hooks/swr/post";
-import { useCallback, useEffect, useState } from "react";
-import Editor from "@/app/(main)/posts/_components/Editor";
+import { useEdit, useView, useViewWithoutTrigger, useWrite } from "@/hooks/swr/post";
+import React, { useEffect, useState } from "react";
+
 import { useRouter } from "next/navigation";
-import Loading from "@/components/common/Loading";
-import { DateTimePicker } from "@mui/x-date-pickers";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import ComboBox from "@/app/(main)/posts/_components/ComboBox";
+import { SubmitHandler, useForm } from "react-hook-form";
+
+import QuillEditor from "@/app/(main)/posts/_components/QuillEditor";
+import Loading from "@/components/common/Loading";
+import { _post } from "../../_types/post";
+
+type FormInputs = {
+  title: string;
+  content: string;
+  golfCourse: string;
+  gameDate: Date | null;
+  kakao: boolean;
+  phone: boolean;
+  tags: string[];
+};
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
+  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#ffffff",
   ...theme.typography.body2,
   padding: theme.spacing(1),
   // textAlign: "center",
@@ -23,43 +37,53 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const Edit = ({ params }: { params: { id: string; username: string } }) => {
-  const { data: view, trigger } = useView();
-  const { trigger: triggerEdit, isMutating } = useEdit(params.id);
-  const [data, setData] = useState({
-    title: "",
-    content: "",
-  });
-  const router = useRouter();
-  const [tags, setTags] = useState<string[]>([]);
-  const [course, setCourse] = useState<number | null>(null);
-  const [gameDate, setGameDate] = useState<Date | null>(null);
-  const [kakao, setKakao] = useState<boolean>(true);
-  const [phone, setPhone] = useState<boolean>(true);
+  const { data: view, isLoading } = useViewWithoutTrigger<{ data: _post; meta: object }>({ id: params.id });
+  const { trigger, isMutating } = useEdit(params.id);
 
-  const onchangeField = useCallback(
-    (p: any) => {
-      setData({ ...data, [p.key]: p.value }); // 뮤테이션 재검증 생략
+  // console.log("v", view);
+
+  // const { trigger, isMutating } = useWrite();
+  const router = useRouter();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue,
+  } = useForm<FormInputs>({
+    // resolver: zodResolver(postSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+      tags: [],
+      kakao: false,
+      phone: false,
     },
-    [data]
-  );
+  });
+
+  const onSubmit: SubmitHandler<FormInputs> = data => {
+    trigger(data, {
+      onSuccess: () => router.push("/posts/list"),
+    });
+  };
+
+  const editorContent = watch("content");
+
+  const onEditorStateChange = (editorState: any) => {
+    setValue("content", editorState);
+  };
 
   useEffect(() => {
-    trigger(params.id, {
-      onSuccess: d => {
-        const { title, content } = d.data.attributes;
-        setData({ title, content });
-        setTags(d.data.attributes.tags);
-        setKakao(d.data.attributes.kakao);
-        setPhone(d.data.attributes.phone);
-        setCourse(d.data.attributes.course);
-        setGameDate(d.data.attributes.gameDate);
-      },
-    });
-  }, [params.id, trigger]);
-
-  if (isMutating) {
-    return <Loading />;
-  }
+    if (view) {
+      setValue("title", view.data.attributes.title);
+      setValue("content", view.data.attributes.content);
+      setValue("tags", view.data.attributes.tags);
+      setValue("kakao", view.data.attributes.kakao);
+      setValue("phone", view.data.attributes.phone);
+      setValue("gameDate", new Date(view.data.attributes.gameDate));
+    }
+  }, [setValue, view]);
 
   return (
     <Box sx={{ flex: 1, width: "100%" }}>
@@ -71,97 +95,83 @@ const Edit = ({ params }: { params: { id: string; username: string } }) => {
           //zIndex: 9995,
         }}
       >
+        {isMutating && <Loading />}
         <Stack spacing={2}>
-          <Item>
-            <Editor title={data.title} content={data.content} onChangeField={onchangeField} />
-
-            <FormControl component="fieldset">
-              <FormLabel component="legend">연락처 공개</FormLabel>
-              <FormGroup row>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setKakao(event.target.checked);
-                      }}
-                      checked={kakao}
-                    />
-                  }
-                  label="카카오톡"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setPhone(event.target.checked);
-                      }}
-                      checked={phone}
-                    />
-                  }
-                  label="휴대폰번호"
-                />
-              </FormGroup>
-            </FormControl>
-          </Item>
-
-          <Item>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <DateTimePicker
-                  label="Tee Off Time"
-                  onChange={(value: Date | null) => {
-                    //console.log(typeof e, e);
-                    setGameDate(value);
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <ComboBox
-                  onChange={(event: any, newValue: any) => {
-                    setCourse(newValue.id);
-                  }}
-                />
-              </Grid>
-            </Grid>
-          </Item>
-
-          <Item>
-            <Stack spacing={2}>
-              <TagBox
-                tags={tags}
-                onChangeTags={(nextTags: any) => {
-                  setTags(nextTags);
+          {/* <Item>
+            <TextField id="standard-basic" label="" fullWidth placeholder="제목을 입력해 주세요." value={data.title} onChange={e => setTitle(e.target.value)} />
+          </Item> */}
+          <form noValidate onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
+            <Item>
+              {/* <Controller
+                name="editor"
+                control={control}
+                render={({ field, fieldState }) => {
+                  console.log("field", field);
+                  return <Editor {...field} title={field.value.title} content={field.value.content} />;
                 }}
+              ></Controller> */}
+              <Input
+                placeholder="제목을 입력하세요."
+                // onChange={e => onChangeField({ key: "title", value: e.target.value })}
+                // onChange={event =>
+                //   props.onChange((e: any) => {
+                //     return { ...e, title: event.target.value };
+                //   })
+                // }
+                // value={props.value.title}
+                {...register("title")}
+                // value={view?.attributes.title}
+                sx={{ fontSize: "2rem", outline: "none", pb: "0.5rem", border: "none", borderBottom: 1, borderColor: "primary.main", mb: "2rem", width: 1 }}
               />
-            </Stack>
-            <Stack direction="row-reverse" spacing={2}>
-              <Button variant="outlined" startIcon={<DeleteIcon />} onClick={() => router.back()}>
-                취소
-              </Button>
-              <Button
-                onClick={
-                  () => {
-                    triggerEdit(
-                      { ...data, tags },
-                      {
-                        onSuccess: () => router.push("/posts/list"),
-                      }
-                    );
-                  }
-                  // trigger(
-                  //   { ...data, tags },
-                  //   {
-                  //     onSuccess: () => router.push("/board/list"),
-                  //   }
-                  // )
-                }
-                variant="outlined"
-                startIcon={<SendIcon />}
-              >
-                확인
-              </Button>
-            </Stack>
-          </Item>
+
+              <QuillEditor value={editorContent} onChange={onEditorStateChange} />
+              <FormControl component="fieldset">
+                <FormLabel component="legend">연락처 공개</FormLabel>
+                <FormGroup row>
+                  <FormControlLabel control={<Checkbox defaultChecked {...register("kakao")} />} label="카카오톡" />
+                  <FormControlLabel control={<Checkbox defaultChecked {...register("phone")} />} label="휴대폰번호" />
+                </FormGroup>
+              </FormControl>
+            </Item>
+            <Item>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <DateTimePicker
+                    label="Tee Off Time"
+                    onChange={(value: Date | null) => {
+                      setValue("gameDate", value);
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <ComboBox
+                    onChange={(event: any, newValue: any) => {
+                      // setCourse(newValue.id);
+                      setValue("golfCourse", newValue.id);
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </Item>
+            <Item>
+              <Stack spacing={2}>
+                <TagBox
+                  tags={watch("tags")}
+                  onChangeTags={(nextTags: any) => {
+                    setValue("tags", nextTags);
+                  }}
+                />
+              </Stack>
+              <Stack direction="row-reverse" spacing={2}>
+                <Button variant="outlined" startIcon={<DeleteIcon />}>
+                  취소
+                </Button>
+                <Button type="submit" variant="outlined" startIcon={<SendIcon />} disabled={isMutating}>
+                  확인
+                </Button>
+              </Stack>
+            </Item>
+          </form>
         </Stack>
       </Box>
     </Box>

@@ -11,7 +11,7 @@ import CardActions from "@mui/material/CardActions";
 import Collapse from "@mui/material/Collapse";
 import IconButton, { IconButtonProps } from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import { Avatar, Box, Chip, Menu, MenuItem, SvgIcon } from "@mui/material";
+import { Avatar, Box, Chip, Menu, MenuItem } from "@mui/material";
 import { useRouter } from "next/navigation";
 
 // icons
@@ -64,8 +64,6 @@ export default function TourCard({
 }) {
   const router = useRouter();
   const [expanded, setExpanded] = React.useState(false);
-  // const pages = ["Products", "Pricing", "Blog"];
-
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
@@ -90,7 +88,7 @@ export default function TourCard({
               <MoreVertIcon />
             </IconButton>
           }
-          title={golfCourse.Name}
+          title={golfCourse?.name}
           subheader={moment(gameDate).format("MMMM Do (dd) h:mm")}
         />
         <Menu
