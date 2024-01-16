@@ -26,12 +26,12 @@ export default function ComboBox(comboBoxProps: any) {
       }}
       getOptionLabel={(option: golfCourse) => {
         // console.log("op", option);
-        return option.Name || "";
+        return option.name || "";
       }}
       renderOption={(props, option: golfCourse) => {
         return (
           <Box component="li" sx={{ "& > img": { mr: 2, flexShrink: 0 } }} {...props} key={option.id.toString()}>
-            {option.Name} {option.Type === "Public" ? "[P]" : ""}
+            {option.name} {option.type === "Public" ? "[P]" : ""}
           </Box>
         );
       }}

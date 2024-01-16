@@ -1,10 +1,10 @@
 export type golfCourse = {
   id: number;
-  Name: string;
-  Address: string;
-  Holes: number;
-  Location: string;
-  Type: "Membership" | "Public";
+  name: string;
+  address: string;
+  holes: number;
+  location: string;
+  type: "Membership" | "Public";
   createdAt: Date;
   locale: string;
   publishedAt: Date;
