@@ -120,7 +120,7 @@ export function useView() {
   return { data, trigger, isMutating, reset, error };
 }
 
-export function useViewWithoutTrigger<T>({ id }: { id: string }) {
-  const { data, error, isLoading } = useSWR<T>(`${process.env.NEXT_PUBLIC_API_URL}/posts/${id}`);
-  return { data, error, isLoading };
+export function useViewWithoutTrigger({ id }: { id: string }) {
+  const { data, error, isLoading, mutate } = useSWR<{ data: _post; meta: object }>(`${process.env.NEXT_PUBLIC_API_URL}/posts/${id}`);
+  return { data, error, isLoading, mutate };
 }

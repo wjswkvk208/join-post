@@ -1,24 +1,20 @@
 import { useState } from "react";
 
-export const useDialog = ({ onClose }: { onClose: Function | undefined }) => {
+export const useDialog = () => {
   const [display, setDisplay] = useState(false);
-
-  const openDialog = ({ row }: any | undefined) => {
+  const [postId, setPostId] = useState<string>("");
+  const openDialog = (postId: string) => {
     setDisplay(true);
+    setPostId(postId);
   };
   const handleClose = () => {
     setDisplay(false);
-    onClose && onClose();
   };
 
-  // const handleSubmit =() => {
-
-  // }
   const props = {
     open: display,
-
+    postId: postId,
     handleClose,
-    //handleSubmit
   };
   return [openDialog, props] as const;
 };

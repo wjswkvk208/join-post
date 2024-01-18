@@ -1,25 +1,23 @@
 "use client";
-import Loading from "@/components/common/Loading";
-import DialogView from "@/app/(main)/posts/_components/DialogView";
 
-import { Datepicker, DatepickerEvent } from "@meinefinsternis/react-horizontal-date-picker";
+import { useEffect, useState } from "react";
+import { Box, Button, Grid, Stack, TextField } from "@mui/material";
+
 import { useDialog } from "@/hooks/dialog";
+import { useList } from "@/hooks/swr/post";
 
-import { useList, useView } from "@/hooks/swr/post";
-
-import { Box, Button, DialogContentText, Grid, Stack, TextField } from "@mui/material";
-
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { ko } from "date-fns/locale";
 import TourCard from "@/app/(main)/posts/_components/TourCard";
-
-import CommentList from "../_components/CommentList";
-import { _post } from "@/app/(main)/posts/_types/post";
 import RegionButtons from "../_components/RegionButtons";
+import Loading from "@/components/common/Loading";
+
+import { _post } from "@/app/(main)/posts/_types/post";
+import { ko } from "date-fns/locale";
+import { Datepicker, DatepickerEvent } from "@meinefinsternis/react-horizontal-date-picker";
+import { useQueryState } from "nuqs";
+import PostView from "../_components/PostView";
 
 const Post = () => {
-  const router = useRouter();
+  const [post, setPost] = useQueryState("post");
   const [date, setDate] = useState<{
     endValue: Date | null;
     startValue: Date | null;
@@ -38,9 +36,7 @@ const Post = () => {
   };
 
   const handleRegion = (event: React.MouseEvent<HTMLElement>, newRegions: string[]) => {
-    //console.log(event, newRegions);
     setRegion(newRegions);
-    // mutate();
   };
 
   const { data, isLoading, mutate } = useList({
@@ -51,9 +47,15 @@ const Post = () => {
     region: region,
   });
 
-  const { data: view, trigger, reset } = useView();
+  // const { data: view, trigger, reset } = useView();
 
-  const [openDialog, dialogProps] = useDialog({ onClose: reset });
+  const [openDialog, dialogProps] = useDialog();
+
+  useEffect(() => {
+    if (post && dialogProps.open === false) {
+      return () => openDialog(post);
+    }
+  }, [dialogProps.open, openDialog, post]);
 
   if (isLoading) {
     return <Loading />;
@@ -97,8 +99,7 @@ const Post = () => {
                   kakao={r.attributes.kakao}
                   phone={r.attributes.phone}
                   onView={() => {
-                    trigger(r.id.toString());
-                    openDialog({ row: r.id.toString() });
+                    setPost(r.id.toString());
                   }}
                 />
               </Grid>
@@ -112,22 +113,7 @@ const Post = () => {
           </Button>
         </Stack>
 
-        <DialogView
-          title={view ? view.data.attributes.title : "Loading..."}
-          {...dialogProps}
-          // onClose={() => {
-          //   reset();
-          // }}
-          handleEdit={() => {
-            router.push(`/posts/edit/${view?.data.id}`);
-          }}
-          handleDelete={() => {
-            console.log("delete");
-          }}
-          commentBox={<CommentList postId={view && view.data.id} />}
-        >
-          {view && <DialogContentText>{view.data.attributes.content}</DialogContentText>}
-        </DialogView>
+        <PostView {...dialogProps}></PostView>
       </Box>
     );
   }
