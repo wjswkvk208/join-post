@@ -16,10 +16,7 @@ const handleEdit = () => {};
 const PostView = ({ open, postId, handleClose }: { open: boolean; postId: string; handleClose: MouseEventHandler<HTMLButtonElement> | undefined }) => {
   const { data: view, isLoading, mutate } = useViewWithoutTrigger({ id: postId });
 
-  // useEffect(() => {
-  //   if (open === true) mutate();
-  // }, [mutate, open]);
-  if (view)
+  if (view && postId) {
     return (
       <Dialog open={open} fullScreen onClose={handleClose} TransitionComponent={Transition}>
         <AppBar sx={{ position: "relative" }}>
@@ -56,6 +53,7 @@ const PostView = ({ open, postId, handleClose }: { open: boolean; postId: string
         <CommentList postId={view.data.id} />
       </Dialog>
     );
+  }
 };
 
 const Transition = React.forwardRef(function Transition(
