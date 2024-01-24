@@ -51,9 +51,12 @@ const Post = () => {
 
   const [openDialog, dialogProps] = useDialog();
 
+  // post 파라미터가 들어오면 view open
   useEffect(() => {
     if (post && dialogProps.open === false) {
-      return () => openDialog(post);
+      return () => {
+        openDialog(post);
+      };
     }
   }, [dialogProps.open, openDialog, post]);
 
@@ -99,7 +102,8 @@ const Post = () => {
                   kakao={r.attributes.kakao}
                   phone={r.attributes.phone}
                   onView={() => {
-                    setPost(r.id.toString());
+                    // setPost(r.id.toString());
+                    openDialog(r.id.toString());
                   }}
                 />
               </Grid>

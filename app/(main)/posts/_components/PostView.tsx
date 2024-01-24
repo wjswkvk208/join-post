@@ -9,13 +9,27 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import React, { MouseEventHandler, useEffect } from "react";
 import { useViewWithoutTrigger } from "@/hooks/swr/post";
 import CommentList from "./CommentList";
+import Loading from "@/components/common/Loading";
 
 const handleDelete = () => {};
 const handleEdit = () => {};
 
-const PostView = ({ open, postId, handleClose }: { open: boolean; postId: string; handleClose: MouseEventHandler<HTMLButtonElement> | undefined }) => {
+const PostView = ({
+  open,
+  postId,
+  handleClose,
+  onClose,
+}: {
+  open: boolean;
+  postId: string;
+  handleClose: MouseEventHandler<HTMLButtonElement>;
+  onClose?: MouseEventHandler<HTMLButtonElement> | undefined;
+}) => {
   const { data: view, isLoading, mutate } = useViewWithoutTrigger({ id: postId });
 
+  if (isLoading) {
+    return <Loading />;
+  }
   if (view && postId) {
     return (
       <Dialog open={open} fullScreen onClose={handleClose} TransitionComponent={Transition}>
