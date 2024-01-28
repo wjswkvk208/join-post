@@ -1,6 +1,25 @@
 "use client";
 import AppBar from "@/components/common/AppBar";
-import { Avatar, Badge, Box, Container, CssBaseline, Divider, IconButton, Link, List, Menu, MenuItem, ThemeProvider, Toolbar, Typography, createTheme } from "@mui/material";
+import {
+  Avatar,
+  Badge,
+  Box,
+  Container,
+  CssBaseline,
+  Divider,
+  IconButton,
+  Link,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Menu,
+  MenuItem,
+  ThemeProvider,
+  Toolbar,
+  Typography,
+  createTheme,
+} from "@mui/material";
 import React, { Suspense } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
@@ -58,11 +77,18 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
               {status === "authenticated" ? (
                 <>
-                  <IconButton color="inherit" onClick={handleMenu}>
-                    <Badge badgeContent={4} color="secondary">
-                      {/* <NotificationsIcon /> */}
-                      <Avatar alt={session.user.nickname} src={session.user.image ?? ""} />
+                  <IconButton aria-label="notification" onClick={handleMenu}>
+                    <Badge badgeContent={4} color="secondary" overlap="circular">
+                      {/* <Avatar sx={{ bgcolor: green[500] }}> */}
+                      <NotificationsIcon />
+                      {/* </Avatar> */}
                     </Badge>
+                  </IconButton>
+                  <IconButton aria-label="account" color="inherit" onClick={handleMenu}>
+                    {/* <Badge badgeContent={4} color="secondary"> */}
+
+                    <Avatar alt={session.user.nickname} src={session.user.image ?? ""} sx={{ width: 32, height: 32 }} />
+                    {/* </Badge> */}
                   </IconButton>
 
                   <Menu
@@ -77,7 +103,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                       vertical: "top",
                       horizontal: "left",
                     }}
-                    open={Boolean(anchorEl)}
+                    open={anchorEl?.ariaLabel === "account"}
                     onClose={handleClose}
                   >
                     <MenuItem component={Link} href={"/account"}>
@@ -85,6 +111,56 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     </MenuItem>
 
                     <MenuItem onClick={() => signOut()}>로그아웃</MenuItem>
+                  </Menu>
+
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={anchorEl?.ariaLabel === "notification"}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "left",
+                    }}
+                    onClose={handleClose}
+                    sx={{ mt: 5 }}
+                  >
+                    <MenuItem>
+                      <ListItemAvatar>
+                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary="Brunch this weekend?"
+                        secondary={
+                          <React.Fragment>
+                            <Typography sx={{ display: "inline" }} component="span" variant="body2" color="text.primary">
+                              Ali Connors
+                            </Typography>
+                            {" — I'll be in your neighborhood doing errands this…"}
+                          </React.Fragment>
+                        }
+                      />
+                    </MenuItem>
+
+                    <MenuItem>
+                      <ListItemAvatar>
+                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary="Brunch this weekend?"
+                        secondary={
+                          <React.Fragment>
+                            <Typography sx={{ display: "inline" }} component="span" variant="body2" color="text.primary">
+                              Ali Connors
+                            </Typography>
+                            {" — I'll be in your neighborhood doing errands this…"}
+                          </React.Fragment>
+                        }
+                      />
+                    </MenuItem>
                   </Menu>
                 </>
               ) : (
