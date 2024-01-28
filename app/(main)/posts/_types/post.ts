@@ -16,5 +16,6 @@ export type _post = {
     tags: string[];
     kakao: boolean;
     phone: boolean;
+    subscription: boolean;
   };
 };

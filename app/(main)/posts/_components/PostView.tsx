@@ -5,28 +5,21 @@ import AppBar from "../../../../components/common/AppBar";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-
+import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import React, { MouseEventHandler, useEffect } from "react";
 import { useViewWithoutTrigger } from "@/hooks/swr/post";
 import CommentList from "./CommentList";
 import Loading from "@/components/common/Loading";
+import { useSubscription, useUnsubscription } from "@/hooks/swr/subscription";
 
 const handleDelete = () => {};
 const handleEdit = () => {};
 
-const PostView = ({
-  open,
-  postId,
-  handleClose,
-  onClose,
-}: {
-  open: boolean;
-  postId: string;
-  handleClose: MouseEventHandler<HTMLButtonElement>;
-  onClose?: MouseEventHandler<HTMLButtonElement> | undefined;
-}) => {
+const PostView = ({ open, postId, handleClose }: { open: boolean; postId: string; handleClose: MouseEventHandler<HTMLButtonElement> }) => {
   const { data: view, isLoading, mutate } = useViewWithoutTrigger({ id: postId });
-
+  const { trigger: subscribe } = useSubscription(postId);
+  const { trigger: unsubscribe } = useUnsubscription(postId);
   if (isLoading) {
     return <Loading />;
   }
@@ -49,6 +42,36 @@ const PostView = ({
             <IconButton edge="start" color="inherit" onClick={handleDelete} aria-label="delete" sx={{ ml: 1 }}>
               <DeleteIcon />
             </IconButton>
+
+            {!view.data.attributes.subscription && (
+              <IconButton
+                edge="start"
+                color="inherit"
+                onClick={() => {
+                  subscribe();
+                  mutate();
+                }}
+                aria-label="delete"
+                sx={{ ml: 1 }}
+              >
+                <NotificationsOffIcon />
+              </IconButton>
+            )}
+
+            {view.data.attributes.subscription && (
+              <IconButton
+                edge="start"
+                color="inherit"
+                onClick={() => {
+                  unsubscribe();
+                  mutate();
+                }}
+                aria-label="delete"
+                sx={{ ml: 1 }}
+              >
+                <NotificationsActiveIcon />
+              </IconButton>
+            )}
           </Toolbar>
         </AppBar>
 
