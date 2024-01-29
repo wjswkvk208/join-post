@@ -3,7 +3,7 @@ import { updateComment, useComments } from "@/hooks/swr/comment";
 import { getDayMinuteCounter } from "@/utils/date";
 import { Avatar, Box, Divider, List, ListItem, ListItemAvatar, ListItemText, TextField, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const CommentList = ({ postId }: { postId: string | number | undefined }) => {
   const { data: session } = useSession();
@@ -30,7 +30,7 @@ const CommentList = ({ postId }: { postId: string | number | undefined }) => {
               <React.Fragment key={comment.id}>
                 <ListItem alignItems="flex-start">
                   <ListItemAvatar>
-                    <Avatar alt={comment.attributes.user.data.nickname} src={`${process.env.NEXT_PUBLIC_URL}${comment.attributes.user.data.attributes.picture.data.attributes.url}`} />
+                    <Avatar alt={comment.attributes.user.data.attributes.nickname} src={`${process.env.NEXT_PUBLIC_URL}${comment.attributes.user.data.attributes.picture.data.attributes.url}`} />
                   </ListItemAvatar>
                   <ListItemText
                     primary={comment.attributes.user.data.attributes.nickname}

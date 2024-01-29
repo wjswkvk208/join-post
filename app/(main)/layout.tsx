@@ -28,6 +28,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { mainListItems, secondaryListItems } from "./listItems";
 import Copyright from "@/components/common/Copyright";
 import { useSession, signOut } from "next-auth/react";
+import Notification from "./_component/Notification";
 
 const defaultTheme = createTheme();
 
@@ -128,39 +129,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     onClose={handleClose}
                     sx={{ mt: 5 }}
                   >
-                    <MenuItem>
-                      <ListItemAvatar>
-                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary="Brunch this weekend?"
-                        secondary={
-                          <React.Fragment>
-                            <Typography sx={{ display: "inline" }} component="span" variant="body2" color="text.primary">
-                              Ali Connors
-                            </Typography>
-                            {" — I'll be in your neighborhood doing errands this…"}
-                          </React.Fragment>
-                        }
-                      />
-                    </MenuItem>
-
-                    <MenuItem>
-                      <ListItemAvatar>
-                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary="Brunch this weekend?"
-                        secondary={
-                          <React.Fragment>
-                            <Typography sx={{ display: "inline" }} component="span" variant="body2" color="text.primary">
-                              Ali Connors
-                            </Typography>
-                            {" — I'll be in your neighborhood doing errands this…"}
-                          </React.Fragment>
-                        }
-                      />
-                    </MenuItem>
+                    <Notification />
                   </Menu>
                 </>
               ) : (

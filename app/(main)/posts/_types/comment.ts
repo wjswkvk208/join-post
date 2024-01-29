@@ -1,4 +1,5 @@
 import { _post } from "./post";
+import { _user } from "../../_type/user";
 
 export type _comment = {
   id: number;

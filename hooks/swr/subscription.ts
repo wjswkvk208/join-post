@@ -25,7 +25,7 @@ export const useSubscription = (postId: string) => {
 };
 
 export const useUnsubscription = (postId: string) => {
-  const { trigger, isMutating } = useSWRMutation(`${process.env.NEXT_PUBLIC_API_URL}/subscriptions/${postId}`, async (url: string, { arg }: { arg: any }) => {
+  const { trigger, isMutating } = useSWRMutation(`${process.env.NEXT_PUBLIC_API_URL}/subscriptions/${postId}`, async (url: string) => {
     const session = await getSession();
     return fetch(url, {
       method: "DELETE",
